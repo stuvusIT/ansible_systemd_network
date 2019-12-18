@@ -1,0 +1,25 @@
+---
+- name: Instantiate systemd-networkd network devices
+  template:
+    src: netdev.j2
+    dest: /etc/systemd/network/{{ netdev.key }}.netdev
+    owner: systemd-network
+    mode: 0640
+  loop: "{{ systemd_networkd_netdevs | dict2items }}"
+  loop_control:
+    loop_var: netdev
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd
+
+- name: Instantiate systemd-networkd networks
+  template:
+    src: network.j2
+    dest: /etc/systemd/network/{{ network.key }}.network
+    owner: systemd-network
+  loop: "{{ systemd_networkd_networks | dict2items }}"
+  loop_control:
+    loop_var: network
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd

@@ -1,0 +1,10 @@
+---
+- name: Reload systemd configuration
+  service:
+    daemon_reload: True
+
+- name: Restart systemd-networkd
+  service:
+    name: systemd-networkd
+    enabled: yes
+    state: restarted
