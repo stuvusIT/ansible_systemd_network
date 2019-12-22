@@ -5,7 +5,7 @@
     dest: /etc/systemd/network/{{ netdev.key }}.netdev
     owner: systemd-network
     mode: 0640
-  loop: "{{ systemd_networkd_netdevs | default({}) | dict2items }}"
+  loop: "{{ systemd_networkd_netdevs | dict2items }}"
   loop_control:
     loop_var: netdev
   notify:
@@ -17,7 +17,7 @@
     src: network.j2
     dest: /etc/systemd/network/{{ network.key }}.network
     owner: systemd-network
-  loop: "{{ systemd_networkd_networks | default({}) | dict2items }}"
+  loop: "{{ systemd_networkd_networks | dict2items }}"
   loop_control:
     loop_var: network
   notify:
@@ -28,10 +28,10 @@
   file:
     path: "{{ item | dirname }}"
     state: directory
-  loop: "{{ systemd_networkd_copy_files | default([]) | map(attribute='dest') | list }}"
+  loop: "{{ systemd_networkd_copy_files | map(attribute='dest') | list }}"
 
 - name: Copy extra files relevant for systemd-networkd
   copy: "{{ item }}"
-  loop: "{{ systemd_networkd_copy_files | default([]) }}"
+  loop: "{{ systemd_networkd_copy_files }}"
   notify:
     - Restart systemd-networkd
