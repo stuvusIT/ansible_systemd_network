@@ -23,3 +23,15 @@
   notify:
     - Reload systemd configuration
     - Restart systemd-networkd
+
+- name: Create extra directories relevant for systemd-networkd
+  file:
+    path: "{{ item | dirname }}"
+    state: directory
+  loop: "{{ systemd_networkd_copy_files | default([]) | map(attribute='dest') | list }}"
+
+- name: Copy extra files relevant for systemd-networkd
+  copy: "{{ item }}"
+  loop: "{{ systemd_networkd_copy_files | default([]) }}"
+  notify:
+    - Restart systemd-networkd
