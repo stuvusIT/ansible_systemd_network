@@ -107,7 +107,7 @@ systemd_networkd_networks:
 # Name=my_bridge
 # Kind=bridge
 #
-##### /etc/systemd/network/enp1s0 enp2s0.network
+##### "/etc/systemd/network/enp1s0 enp2s0.network"
 #
 # [Match]
 # Name=enp1s0 enp2s0
