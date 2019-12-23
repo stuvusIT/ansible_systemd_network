@@ -1,7 +1,9 @@
-# Ansible role for systemd-networkd
+# Ansible role for network configuration using systemd-networkd
 
 This role translates YAML into a [systemd-networkd](https://www.freedesktop.org/software/systemd/man/systemd-networkd.html)
-configuration. "systemd-networkd is a system service that manages networks".
+configuration.
+"systemd-networkd is a system service that manages networks".
+For DNS resolution, you can choose between systemd-resolved and resolvconf.
 
 ## Requirements
 
@@ -217,6 +219,9 @@ systemd_networkd_networks:
 
 This role automatically disables resolvconf, enables systemd-resolved
 and configures the `/etc/resolv.conf` symlink correctly for systemd-resolved.
+Using systemd-resolved (as this role does by default) is recommended because
+systemd-resolved reads the DNS servers from your systemd network configuration,
+whereas the DNS servers for resolvconf can't be configured using this role.
 
 If you want to use resolvconf instead, there's a role variable for that:
 
