@@ -35,3 +35,12 @@
   loop: "{{ systemd_networkd_copy_files }}"
   notify:
     - Restart systemd-networkd
+
+- name: Configure resolv.conf
+  file:
+    dest: /etc/resolv.conf
+    state: link
+    src: "{{ _systemd_networkd_resolv_conf_paths[systemd_networkd_dns_resolver] }}"
+    force: True
+  notify:
+    - Configure resolver

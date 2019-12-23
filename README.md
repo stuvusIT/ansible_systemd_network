@@ -213,6 +213,17 @@ systemd_networkd_networks:
 # VLAN=enp1s0.11
 ```
 
+## DNS resolver
+
+This role automatically disables resolvconf, enables systemd-resolved
+and configures the `/etc/resolv.conf` symlink correctly for systemd-resolved.
+
+If you want to use resolvconf instead, there's a role variable for that:
+
+```yml
+systemd_networkd_dns_resolver: resolvconf
+```
+
 ## Upload extra files
 
 There also is a role variable `systemd_networkd_copy_files` which
@@ -260,8 +271,9 @@ systemd_networkd_networks:
 
 ## Role variable defaults
 
-| Name                          | Default | Description                                    |
-| :---------------------------- | :------ | :--------------------------------------------- |
-| `systemd_networkd_netdevs`    | `{}`    | [#detailed-description](#detailed-description) |
-| `systemd_networkd_networks`   | `{}`    | [#detailed-description](#detailed-description) |
-| `systemd_networkd_copy_files` | `[]`    | [#upload-extra-files](#upload-extra-files)     |
+| Name                            | Default            | Description                                    |
+| :------------------------------ | :----------------- | :--------------------------------------------- |
+| `systemd_networkd_netdevs`      | `{}`               | [#detailed-description](#detailed-description) |
+| `systemd_networkd_networks`     | `{}`               | [#detailed-description](#detailed-description) |
+| `systemd_networkd_copy_files`   | `[]`               | [#upload-extra-files](#upload-extra-files)     |
+| `systemd_networkd_dns_resolver` | `systemd-resolved` | [#dns-resolver](#dns-resolver)                 |
