@@ -1,0 +1,4 @@
+---
+_systemd_network_resolv_conf_paths:
+  resolvconf: /etc/resolvconf/run/resolv.conf
+  systemd-resolved: /run/systemd/resolve/resolv.conf

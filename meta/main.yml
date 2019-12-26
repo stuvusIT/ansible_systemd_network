@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  author: haslersn
+  description: Network configuration using systemd.network; see https://www.freedesktop.org/software/systemd/man/systemd.network.html
+  company: stuvus (https://stuvus.uni-stuttgart.de)
+
+  license: AGPLv3
+
+  min_ansible_version: 2.6
+
+  platforms:
+    - name: Debian
+      versions:
+        - stretch
+        - buster
+
+  galaxy_tags:
+    - systemd
+    - network
+    - networkd
+
+dependencies: []
