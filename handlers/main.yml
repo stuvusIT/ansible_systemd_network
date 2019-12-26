@@ -14,12 +14,12 @@
     name: "{{ item }}"
     enabled: False
     state: stopped
-  loop: "{{ _systemd_networkd_resolv_conf_paths.keys() | difference([systemd_networkd_dns_resolver]) }}"
+  loop: "{{ _systemd_network_resolv_conf_paths.keys() | difference([systemd_network_dns_resolver]) }}"
   listen: Configure resolver
 
 - name: Enable wanted resolver
   service:
-    name: "{{ systemd_networkd_dns_resolver }}"
+    name: "{{ systemd_network_dns_resolver }}"
     enabled: True
     state: started
   listen: Configure resolver

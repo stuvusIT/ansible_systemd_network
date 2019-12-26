@@ -1,5 +1,5 @@
 ---
-systemd_networkd_netdevs: {}
-systemd_networkd_networks: {}
-systemd_networkd_copy_files: []
-systemd_networkd_dns_resolver: systemd-resolved
+systemd_network_netdevs: {}
+systemd_network_networks: {}
+systemd_network_copy_files: []
+systemd_network_dns_resolver: systemd-resolved
