@@ -240,7 +240,7 @@ simply takes a list of which each element is passed to the Ansible
 `systemd_network_copy_files` can for example be used for WireGuard key
 files, as illustrated in the following example.
 Installing WireGuard is out of the scope of this role and can be done using
-[our wireguard role]([https:](https://github.com/stuvusIT/wireguard)).
+[our wireguard role](https://github.com/stuvusIT/wireguard).
 
 ```yml
 systemd_network_copy_files:
