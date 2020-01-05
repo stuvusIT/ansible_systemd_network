@@ -3,11 +3,19 @@
   service:
     daemon_reload: True
 
+- name: Disable Debian networking
+  service:
+    name: networking
+    enabled: False
+    state: stopped
+  listen: Configure network services
+
 - name: Restart systemd-networkd
   service:
     name: systemd-networkd
     enabled: True
     state: restarted
+  listen: Configure network services
 
 - name: Disable unwanted resolvers
   service:

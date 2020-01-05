@@ -10,7 +10,7 @@
     loop_var: netdev
   notify:
     - Reload systemd configuration
-    - Restart systemd-networkd
+    - Configure network services
 
 - name: Instantiate systemd-networkd networks
   template:
@@ -22,7 +22,7 @@
     loop_var: network
   notify:
     - Reload systemd configuration
-    - Restart systemd-networkd
+    - Configure network services
 
 - name: Create extra directories relevant for systemd-networkd
   file:
@@ -34,7 +34,7 @@
   copy: "{{ item }}"
   loop: "{{ systemd_network_copy_files }}"
   notify:
-    - Restart systemd-networkd
+    - Configure network services
 
 - name: Configure resolv.conf
   file:
