@@ -5,6 +5,9 @@ configuration.
 "systemd-networkd is a system service that manages networks".
 For DNS resolution, you can choose between systemd-resolved and resolvconf.
 
+The legacy `networking.service` can optionally be enabled, see
+[`systemd_network_enable_legacy_networking`](#role-variable-defaults).
+
 ## Requirements
 
 An apt based system that has systemd-networkd preinstalled,
@@ -276,9 +279,10 @@ systemd_network_networks:
 
 ## Role variable defaults
 
-| Name                           | Default            | Description                                    |
-| :----------------------------- | :----------------- | :--------------------------------------------- |
-| `systemd_network_netdevs`      | `{}`               | [#detailed-description](#detailed-description) |
-| `systemd_network_networks`     | `{}`               | [#detailed-description](#detailed-description) |
-| `systemd_network_copy_files`   | `[]`               | [#upload-extra-files](#upload-extra-files)     |
-| `systemd_network_dns_resolver` | `systemd-resolved` | [#dns-resolver](#dns-resolver)                 |
+| Name                                       | Default              | Description                                    |
+| :----------------------------------------- | :------------------- | :--------------------------------------------- |
+| `systemd_network_netdevs`                  | `{}`                 | [#detailed-description](#detailed-description) |
+| `systemd_network_networks`                 | `{}`                 | [#detailed-description](#detailed-description) |
+| `systemd_network_copy_files`               | `[]`                 | [#upload-extra-files](#upload-extra-files)     |
+| `systemd_network_dns_resolver`             | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                 |
+| `systemd_network_enable_legacy_networking` | `False`              | Whether to enable `networking.service`         |
