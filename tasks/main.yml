@@ -36,11 +36,28 @@
   notify:
     - Restart systemd-networkd
 
+- name: Enable systemd-networkd
+  service:
+    name: systemd-networkd
+    enabled: True
+    state: started
+
 - name: Configure resolv.conf
   file:
     dest: /etc/resolv.conf
     state: link
     src: "{{ _systemd_network_resolv_conf_paths[systemd_network_dns_resolver] }}"
     force: True
-  notify:
-    - Configure resolver
+
+- name: Disable unwanted resolvers
+  service:
+    name: "{{ item }}"
+    enabled: False
+    state: stopped
+  loop: "{{ _systemd_network_resolv_conf_paths.keys() | difference([systemd_network_dns_resolver]) }}"
+
+- name: Enable wanted resolver
+  service:
+    name: "{{ systemd_network_dns_resolver }}"
+    enabled: True
+    state: started
