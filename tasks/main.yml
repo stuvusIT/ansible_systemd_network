@@ -36,18 +36,6 @@
   notify:
     - Restart systemd-networkd
 
-- name: Enable systemd-networkd
-  service:
-    name: systemd-networkd
-    enabled: True
-    state: started
-
-- name: Configure legacy networking
-  service:
-    name: networking
-    enabled: "{{ systemd_network_enable_legacy_networking }}"
-    state: "{% if systemd_network_enable_legacy_networking %}started{% else %}stopped{% endif %}"
-
 - name: Configure resolv.conf
   file:
     dest: /etc/resolv.conf
@@ -65,5 +53,17 @@
 - name: Enable wanted resolver
   service:
     name: "{{ systemd_network_dns_resolver }}"
+    enabled: True
+    state: started
+
+- name: Configure legacy networking
+  service:
+    name: networking
+    enabled: "{{ systemd_network_enable_legacy_networking }}"
+    state: "{% if systemd_network_enable_legacy_networking %}started{% else %}stopped{% endif %}"
+
+- name: Enable systemd-networkd
+  service:
+    name: systemd-networkd
     enabled: True
     state: started
