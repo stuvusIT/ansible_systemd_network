@@ -5,6 +5,13 @@ configuration.
 "systemd-networkd is a system service that manages networks".
 For DNS resolution, you can choose between systemd-resolved and resolvconf.
 
+This role can enable or disable the legacy `networking.service`, see
+[`systemd_network_enable_legacy_networking`](#role-variable-defaults).
+If you set `systemd_network_enable_legacy_networking: keep`, then this role will
+not touch the state of the `networking.service`.
+For configuring your whole network configuration using this role it is
+however recommended to set that variable to `False`.
+
 ## Requirements
 
 An apt based system that has systemd-networkd preinstalled,
@@ -276,9 +283,10 @@ systemd_network_networks:
 
 ## Role variable defaults
 
-| Name                           | Default            | Description                                    |
-| :----------------------------- | :----------------- | :--------------------------------------------- |
-| `systemd_network_netdevs`      | `{}`               | [#detailed-description](#detailed-description) |
-| `systemd_network_networks`     | `{}`               | [#detailed-description](#detailed-description) |
-| `systemd_network_copy_files`   | `[]`               | [#upload-extra-files](#upload-extra-files)     |
-| `systemd_network_dns_resolver` | `systemd-resolved` | [#dns-resolver](#dns-resolver)                 |
+| Name                                       | Default              | Description                                                          |
+| :----------------------------------------- | :------------------- | :------------------------------------------------------------------- |
+| `systemd_network_netdevs`                  | `{}`                 | [#detailed-description](#detailed-description)                       |
+| `systemd_network_networks`                 | `{}`                 | [#detailed-description](#detailed-description)                       |
+| `systemd_network_copy_files`               | `[]`                 | [#upload-extra-files](#upload-extra-files)                           |
+| `systemd_network_dns_resolver`             | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                                       |
+| `systemd_network_enable_legacy_networking` | `"keep"`             | Whether to enable `networking.service` (`True`, `False` or `"keep"`) |

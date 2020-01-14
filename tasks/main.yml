@@ -42,5 +42,29 @@
     state: link
     src: "{{ _systemd_network_resolv_conf_paths[systemd_network_dns_resolver] }}"
     force: True
-  notify:
-    - Configure resolver
+
+- name: Disable unwanted resolvers
+  service:
+    name: "{{ item }}"
+    enabled: False
+    state: stopped
+  loop: "{{ _systemd_network_resolv_conf_paths.keys() | difference([systemd_network_dns_resolver]) }}"
+
+- name: Enable wanted resolver
+  service:
+    name: "{{ systemd_network_dns_resolver }}"
+    enabled: True
+    state: started
+
+- name: Configure legacy networking
+  service:
+    name: networking
+    enabled: "{{ systemd_network_enable_legacy_networking }}"
+    state: "{% if systemd_network_enable_legacy_networking %}started{% else %}stopped{% endif %}"
+  when: systemd_network_enable_legacy_networking != "keep"
+
+- name: Enable systemd-networkd
+  service:
+    name: systemd-networkd
+    enabled: True
+    state: started
