@@ -61,6 +61,7 @@
     name: networking
     enabled: "{{ systemd_network_enable_legacy_networking }}"
     state: "{% if systemd_network_enable_legacy_networking %}started{% else %}stopped{% endif %}"
+  when: systemd_network_enable_legacy_networking != "keep"
 
 - name: Enable systemd-networkd
   service:
