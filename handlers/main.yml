@@ -3,7 +3,7 @@
   service:
     daemon_reload: True
 
-- name: Restart systemd-networkd
+- name: Restart systemd-networkd service
   service:
     name: systemd-networkd
     enabled: True
