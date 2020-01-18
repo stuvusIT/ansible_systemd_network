@@ -10,7 +10,7 @@
     loop_var: netdev
   notify:
     - Reload systemd configuration
-    - Restart systemd-networkd
+    - Restart systemd-networkd service
 
 - name: Instantiate systemd-networkd networks
   template:
@@ -22,7 +22,7 @@
     loop_var: network
   notify:
     - Reload systemd configuration
-    - Restart systemd-networkd
+    - Restart systemd-networkd service
 
 - name: Create extra directories relevant for systemd-networkd
   file:
@@ -34,7 +34,7 @@
   copy: "{{ item }}"
   loop: "{{ systemd_network_copy_files }}"
   notify:
-    - Restart systemd-networkd
+    - Restart systemd-networkd service
 
 - name: Configure resolv.conf
   file:
@@ -43,11 +43,15 @@
     src: "{{ _systemd_network_resolv_conf_paths[systemd_network_dns_resolver] }}"
     force: True
 
+- name: Populate service facts
+  service_facts: {}
+
 - name: Disable unwanted resolvers
   service:
     name: "{{ item }}"
     enabled: False
     state: stopped
+  when: "(item + '.service') in ansible_facts.services"
   loop: "{{ _systemd_network_resolv_conf_paths.keys() | difference([systemd_network_dns_resolver]) }}"
 
 - name: Enable wanted resolver
@@ -56,14 +60,16 @@
     enabled: True
     state: started
 
-- name: Configure legacy networking
+- name: Enable/disable legacy networking
   service:
     name: networking
     enabled: "{{ systemd_network_enable_legacy_networking }}"
     state: "{% if systemd_network_enable_legacy_networking %}started{% else %}stopped{% endif %}"
   when: systemd_network_enable_legacy_networking != "keep"
 
-- name: Enable systemd-networkd
+- meta: flush_handlers
+
+- name: Enable systemd-networkd service
   service:
     name: systemd-networkd
     enabled: True
