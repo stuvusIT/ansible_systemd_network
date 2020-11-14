@@ -43,6 +43,7 @@
     state: link
     src: "{{ _systemd_network_resolv_conf_paths[systemd_network_dns_resolver] }}"
     force: True
+    follow: False
 
 - name: Populate service facts
   service_facts: {}
