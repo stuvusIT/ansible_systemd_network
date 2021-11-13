@@ -4,3 +4,4 @@ systemd_network_networks: {}
 systemd_network_copy_files: []
 systemd_network_dns_resolver: systemd-resolved
 systemd_network_enable_legacy_networking: keep
+systemd_network_keep_existing_definitions: false
