@@ -1,4 +1,39 @@
 ---
+- name: Find existing systemd-network config files
+  find:
+    paths: /etc/systemd/network/
+    patterns:
+      - "*.netdev"
+      - "*.network"
+  register: systemd_network_existing_config_files
+
+- name: Calculate which systemd-network config files to delete
+  set_fact:
+    systemd_network_config_files_to_delete: >-
+      {{ systemd_network_existing_config_files.files
+          | map(attribute='path')
+          | difference(systemd_network_netdevs.keys()
+            | map('regex_replace', '^', '/etc/systemd/network/')
+            | map('regex_replace', '$', '.netdev')
+            | union(systemd_network_networks.keys()
+              | map('regex_replace', '^', '/etc/systemd/network/')
+              | map('regex_replace', '$', '.network')
+            )
+          )
+      }}
+
+- name: Delete existing unwanted systemd-networkd configs
+  file:
+    state: absent
+    path: "{{ config_file }}"
+  loop: "{{ systemd_network_config_files_to_delete }}"
+  loop_control:
+    loop_var: config_file
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd service
+  when: not systemd_network_keep_existing_definitions
+
 - name: Instantiate systemd-networkd network devices
   template:
     src: netdev.j2

@@ -283,10 +283,11 @@ systemd_network_networks:
 
 ## Role variable defaults
 
-| Name                                       | Default              | Description                                                          |
-| :----------------------------------------- | :------------------- | :------------------------------------------------------------------- |
-| `systemd_network_netdevs`                  | `{}`                 | [#detailed-description](#detailed-description)                       |
-| `systemd_network_networks`                 | `{}`                 | [#detailed-description](#detailed-description)                       |
-| `systemd_network_copy_files`               | `[]`                 | [#upload-extra-files](#upload-extra-files)                           |
-| `systemd_network_dns_resolver`             | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                                       |
-| `systemd_network_enable_legacy_networking` | `"keep"`             | Whether to enable `networking.service` (`True`, `False` or `"keep"`) |
+| Name                                        | Default              | Description                                                          |
+| :------------------------------------------ | :------------------- | :------------------------------------------------------------------- |
+| `systemd_network_netdevs`                   | `{}`                 | [#detailed-description](#detailed-description)                       |
+| `systemd_network_networks`                  | `{}`                 | [#detailed-description](#detailed-description)                       |
+| `systemd_network_copy_files`                | `[]`                 | [#upload-extra-files](#upload-extra-files)                           |
+| `systemd_network_dns_resolver`              | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                                       |
+| `systemd_network_enable_legacy_networking`  | `"keep"`             | Whether to enable `networking.service` (`True`, `False` or `"keep"`) |
+| `systemd_network_keep_existing_definitions` | `false`              | Whether to keep existing files in `/etc/systemd/network`             |
