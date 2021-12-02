@@ -105,9 +105,13 @@
     enabled: True
     state: started
 
-- name: Enable/disable legacy networking
+- name: Disable legacy networking
   service:
     name: networking
-    enabled: "{{ systemd_network_enable_legacy_networking }}"
-    state: "{% if systemd_network_enable_legacy_networking %}started{% else %}stopped{% endif %}"
-  when: systemd_network_enable_legacy_networking != "keep" and 'networking.service' in ansible_facts.services
+    enabled: False
+    state: stopped
+
+- name: Remove /etc/network/interfaces
+  file:
+    path: /etc/network/interfaces
+    state: absent
