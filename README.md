@@ -280,10 +280,10 @@ systemd_network_networks:
 
 ## Role variable defaults
 
-| Name                                        | Default              | Description                                              |
-| :------------------------------------------ | :------------------- | :------------------------------------------------------- |
-| `systemd_network_netdevs`                   | `{}`                 | [#detailed-description](#detailed-description)           |
-| `systemd_network_networks`                  | `{}`                 | [#detailed-description](#detailed-description)           |
-| `systemd_network_copy_files`                | `[]`                 | [#upload-extra-files](#upload-extra-files)               |
-| `systemd_network_dns_resolver`              | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                           |
-| `systemd_network_keep_existing_definitions` | `false`              | Whether to keep existing files in `/etc/systemd/network` |
+| Name                                        | Default              | Description                                                                                                                                          |
+| :------------------------------------------ | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `systemd_network_netdevs`                   | `{}`                 | [#detailed-description](#detailed-description)                                                                                                       |
+| `systemd_network_networks`                  | `{}`                 | [#detailed-description](#detailed-description)                                                                                                       |
+| `systemd_network_copy_files`                | `[]`                 | [#upload-extra-files](#upload-extra-files)                                                                                                           |
+| `systemd_network_dns_resolver`              | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                                                                                                                       |
+| `systemd_network_keep_existing_definitions` | `false`              | If false, the role deletes existing `.netdev` and `.network` files in `/etc/systemd/network/` and also deletes the corresponding network interfaces. |
