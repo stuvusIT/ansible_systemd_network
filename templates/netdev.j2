@@ -1,10 +1,10 @@
 # {{ ansible_managed }}
 
 {% for section_name, section_contents in ({"NetDev": {"Name": netdev.key}} | combine(netdev.value, recursive=True)).items() %}
-{% for content in [section_contents] | flatten(levels=1) %}
+{% for content in [section_contents] | flatten %}
 [{{ section_name }}]
 {% for key, values in content.items() %}
-{% for v in [values] | flatten(levels=1) %}
+{% for v in [values] | flatten %}
 {{ key }}={{ v }}
 {% endfor %}
 {% endfor %}

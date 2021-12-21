@@ -16,7 +16,7 @@
         | map(attribute='path')
         | select("match", ".*\.netdev$")
         | map('basename') | map('splitext') | map('first')
-        | difference(systemd_network_netdevs.keys())
+        | difference((systemd_network_netdevs | combine).keys())
       }}
     systemd_network_networks_to_delete: >-
       {{
@@ -24,7 +24,7 @@
         | map(attribute='path')
         | select("match", ".*\.network$")
         | map('basename') | map('splitext') | map('first')
-        | difference(systemd_network_networks.keys())
+        | difference((systemd_network_networks | combine).keys())
       }}
   when: not systemd_network_keep_existing_definitions
 
@@ -34,7 +34,7 @@
     dest: /etc/systemd/network/{{ netdev.key }}.netdev
     owner: systemd-network
     mode: 0640
-  loop: "{{ systemd_network_netdevs | dict2items }}"
+  loop: "{{ systemd_network_netdevs | combine | dict2items }}"
   loop_control:
     loop_var: netdev
     label: "{{ netdev.key }}"
@@ -48,7 +48,7 @@
     dest: /etc/systemd/network/{{ network.key }}.network
     owner: systemd-network
     mode: 0640
-  loop: "{{ systemd_network_networks | dict2items }}"
+  loop: "{{ systemd_network_networks | combine | dict2items }}"
   loop_control:
     loop_var: network
     label: "{{ network.key }}"
