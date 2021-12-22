@@ -1,10 +1,10 @@
 # {{ ansible_managed }}
 
 {% for section_name, section_contents in ({"Match": {"Name": network.key}} | combine(network.value, recursive=False)).items() %}
-{% for content in [section_contents] | flatten(levels=1) %}
+{% for content in [section_contents] | flatten %}
 [{{ section_name }}]
 {% for key, values in content.items() %}
-{% for v in [values] | flatten(levels=1) %}
+{% for v in [values] | flatten %}
 {{ key }}={{ v }}
 {% endfor %}
 {% endfor %}
