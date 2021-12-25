@@ -21,6 +21,7 @@ so that you know what you aim for.
 Useful links:
 
 * https://wiki.archlinux.org/index.php/Systemd-networkd
+* https://www.freedesktop.org/software/systemd/man/networkd.conf.html
 * https://www.freedesktop.org/software/systemd/man/systemd.netdev.html
 * https://www.freedesktop.org/software/systemd/man/systemd.network.html
 
@@ -31,6 +32,8 @@ Then, a playbook using this role looks like the following.
   become: true
   roles:
     - role: systemd-networkd
+      systemd_network_confs:
+        # /etc/systemd/networkd.conf.d/*.conf files are configured here; see below for detailed description
       systemd_network_netdevs:
         # /etc/systemd/network/*.netdev files are configured here; see below for examples
       systemd_network_networks:
@@ -132,6 +135,13 @@ systemd_network_networks:
 
 ## Detailed Description
 
+* A key `x` in `systemd_network_confs` causes an INI file
+  `/etc/systemd/networkd.conf.d/x.conf` to be created.
+  Under `systemd.network_confs['x']`,
+  the first-layer keys turn into INI sections,
+  the second-layer keys turn into INI properties and
+  the values thereunder turn into the respective INI values.
+
 * A key `x` in `systemd_network_netdevs` causes an INI file
   `/etc/systemd/network/x.netdev` to be created.
   By default it contains:
@@ -141,10 +151,7 @@ systemd_network_networks:
   Name=x
   ```
 
-  Under `systemd_network_netdevs['x']`,
-  the first-layer keys turn into INI sections,
-  the second-layer keys turn into INI properties and
-  the values thereunder turn into the respective INI values.
+  `systemd_network_netdevs['x']` analogously turns into INI.
 
 * A key `x` in `systemd_network_networks` causes an INI file
   `/etc/systemd/network/x.network` to be created.
