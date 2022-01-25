@@ -230,15 +230,8 @@ systemd_network_networks:
 
 This role automatically disables resolvconf, enables systemd-resolved
 and configures the `/etc/resolv.conf` symlink correctly for systemd-resolved.
-Using systemd-resolved (as this role does by default) is recommended because
-systemd-resolved reads the DNS servers from your systemd network configuration,
-whereas the DNS servers for resolvconf can't be configured using this role.
-
-If you want to use resolvconf instead, there's a role variable for that:
-
-```yml
-systemd_network_dns_resolver: resolvconf
-```
+Note that systemd-resolved reads the DNS servers from your systemd network
+configuration.
 
 ## Upload extra files
 
@@ -292,5 +285,4 @@ systemd_network_networks:
 | `systemd_network_netdevs`                   | `{}`                 | [#detailed-description](#detailed-description)                                                                                                       |
 | `systemd_network_networks`                  | `{}`                 | [#detailed-description](#detailed-description)                                                                                                       |
 | `systemd_network_copy_files`                | `[]`                 | [#upload-extra-files](#upload-extra-files)                                                                                                           |
-| `systemd_network_dns_resolver`              | `"systemd-resolved"` | [#dns-resolver](#dns-resolver)                                                                                                                       |
 | `systemd_network_keep_existing_definitions` | `false`              | If false, the role deletes existing `.netdev` and `.network` files in `/etc/systemd/network/` and also deletes the corresponding network interfaces. |
