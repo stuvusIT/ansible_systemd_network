@@ -176,5 +176,5 @@
     dest: /etc/network/interfaces
     content: |
       # Ansible managed - Do not edit here
-      # We do not use legacy networking, but systemd-network
-      # See /etc/systemd/network for the configuration
+      # We do not use legacy networking but systemd-networkd.
+      # See /etc/systemd/network/ for the configuration
