@@ -165,12 +165,16 @@
     state: started
 
 - name: Disable legacy networking
-  service:
+  systemd:
     name: networking
     enabled: False
+    masked: True
     state: stopped
 
-- name: Remove /etc/network/interfaces
-  file:
-    path: /etc/network/interfaces
-    state: absent
+- name: Remove content from /etc/network/interfaces
+  copy:
+    dest: /etc/network/interfaces
+    content: |
+      # Ansible managed - Do not edit here
+      # We do not use legacy networking but systemd-networkd.
+      # See /etc/systemd/network/ for the configuration
