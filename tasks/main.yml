@@ -97,24 +97,19 @@
   file:
     dest: /etc/resolv.conf
     state: link
-    src: "{{ _systemd_network_resolv_conf_paths[systemd_network_dns_resolver] }}"
+    src: /run/systemd/resolve/resolv.conf
     force: True
     follow: False
 
-- name: Populate service facts
-  service_facts: {}
-
-- name: Disable unwanted resolvers
+- name: Disable resolvconf
   service:
-    name: "{{ item }}"
+    name: resolvconf
     enabled: False
     state: stopped
-  when: "(item + '.service') in ansible_facts.services"
-  loop: "{{ _systemd_network_resolv_conf_paths.keys() | difference([systemd_network_dns_resolver]) }}"
 
-- name: Enable wanted resolver
+- name: Enable systemd-resolved
   service:
-    name: "{{ systemd_network_dns_resolver }}"
+    name: systemd-resolved
     enabled: True
     state: started
 
@@ -135,7 +130,6 @@
   loop_control:
     loop_var: interface_name
   when: not systemd_network_keep_existing_definitions
-
 
 - name: Delete existing unwanted systemd-networkd configs
   file:
