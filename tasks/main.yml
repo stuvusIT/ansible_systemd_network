@@ -101,11 +101,19 @@
     force: True
     follow: False
 
-- name: Disable resolvconf
-  service:
+- name: Check if resolvconf service exists
+  command: systemctl list-unit-files resolvconf.service
+  failed_when: False
+  changed_when: False
+  register: resolvconf_service_list
+
+- name: Stop, disable, and mask resolvconf
+  systemd:
     name: resolvconf
     enabled: False
+    masked: True
     state: stopped
+  when: resolvconf_service_list.rc == 0
 
 - name: Enable systemd-resolved
   service:
