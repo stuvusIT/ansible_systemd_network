@@ -185,12 +185,25 @@
     enabled: True
     state: started
 
+- name: Check if legacy networking exists
+  command: systemctl cat networking
+  check_mode: no
+  register: networking_service_exists
+  changed_when: False
+  failed_when: networking_service_exists.rc not in [0, 1]
+
 - name: Disable legacy networking
   systemd:
     name: networking
     enabled: False
     masked: True
     state: stopped
+  when: networking_service_exists.rc == 0
+
+- name: Make sure /etc/network directory exists
+  file:
+    path: /etc/network
+    state: directory
 
 - name: Remove content from /etc/network/interfaces
   copy:
