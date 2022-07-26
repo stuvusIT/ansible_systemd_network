@@ -1,4 +1,10 @@
 ---
+- name: Create extra directories relevant for systemd-networkd
+  file:
+    path: "{{ item | dirname }}"
+    state: directory
+  loop: "{{ systemd_network_copy_files | map(attribute='dest') | list + ['/etc/systemd/networkd.conf.d/', '/etc/systemd/resolved.conf.d/', '/etc/network/'] }}"
+
 - name: Find existing systemd-network config files
   find:
     paths:
@@ -38,12 +44,6 @@
         | difference((systemd_network_networks | combine).keys())
       }}
   when: not systemd_network_keep_existing_definitions
-
-- name: Create extra directories relevant for systemd-networkd
-  file:
-    path: "{{ item | dirname }}"
-    state: directory
-  loop: "{{ systemd_network_copy_files | map(attribute='dest') | list + ['/etc/systemd/networkd.conf.d/', '/etc/systemd/resolved.conf.d/'] }}"
 
 - name: Instantiate systemd-networkd networkd.conf drop-ins
   template:
@@ -199,11 +199,6 @@
     masked: True
     state: stopped
   when: networking_service_exists.rc == 0
-
-- name: Make sure /etc/network directory exists
-  file:
-    path: /etc/network
-    state: directory
 
 - name: Remove content from /etc/network/interfaces
   copy:
