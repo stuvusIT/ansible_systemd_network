@@ -107,8 +107,8 @@
     follow: False
 
 - name: Check if resolvconf service exists
-  command: systemctl list-unit-files resolvconf.service
-  failed_when: False
+  command: systemctl cat resolvconf.service
+  failed_when: resolvconf_service_list.rc not in [0, 1]
   changed_when: False
   register: resolvconf_service_list
 
@@ -187,10 +187,9 @@
 
 - name: Check if legacy networking exists
   command: systemctl cat networking
-  check_mode: no
-  register: networking_service_exists
-  changed_when: False
   failed_when: networking_service_exists.rc not in [0, 1]
+  changed_when: False
+  register: networking_service_exists
 
 - name: Disable legacy networking
   systemd:
