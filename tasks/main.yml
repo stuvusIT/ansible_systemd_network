@@ -93,6 +93,11 @@
   notify:
     - Restart systemd-networkd service
 
+- name: Install systemd-resolved
+  package:
+    name: systemd-resolved
+  when: ansible_distribution == 'Debian' and not ansible_distribution_major_version is version('12', '<')
+
 - name: Configure resolv.conf
   file:
     dest: /etc/resolv.conf
@@ -114,11 +119,6 @@
     masked: True
     state: stopped
   when: resolvconf_service_list.rc == 0
-
-- name: Install systemd-resolved
-  package:
-    name: systemd-resolved
-  when: ansible_distribution == 'Debian' and not ansible_distribution_major_version is version('12', '<')
 
 - name: Enable systemd-resolved
   service:
