@@ -1,5 +1,6 @@
 ---
 systemd_network_confs: {}
+systemd_resolve_confs: {}
 systemd_network_netdevs: {}
 systemd_network_networks: {}
 systemd_network_copy_files: []

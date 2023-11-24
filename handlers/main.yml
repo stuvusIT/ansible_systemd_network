@@ -8,3 +8,9 @@
     name: systemd-networkd
     enabled: True
     state: restarted
+
+- name: Restart systemd-resolved service
+  service:
+    name: systemd-resolved
+    enabled: True
+    state: restarted
