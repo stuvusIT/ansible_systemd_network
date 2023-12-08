@@ -43,7 +43,7 @@
   file:
     path: "{{ item | dirname }}"
     state: directory
-  loop: "{{ systemd_network_copy_files | map(attribute='dest') | list + ['/etc/systemd/networkd.conf.d/'] }}"
+  loop: "{{ systemd_network_copy_files | map(attribute='dest') | list + ['/etc/systemd/networkd.conf.d/', '/etc/systemd/resolved.conf.d/'] }}"
 
 - name: Instantiate systemd-networkd networkd.conf drop-ins
   template:
@@ -119,6 +119,20 @@
     masked: True
     state: stopped
   when: resolvconf_service_list.rc == 0
+
+- name: Instantiate systemd-resolved resolved.conf drop-ins
+  template:
+    src: conf.j2
+    dest: /etc/systemd/resolved.conf.d/{{ conf.key }}.conf
+    owner: systemd-resolve
+    mode: 0640
+  loop: "{{ systemd_resolve_confs | combine | dict2items }}"
+  loop_control:
+    loop_var: conf
+    label: "{{ conf.key }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-resolved service
 
 - name: Enable systemd-resolved
   service:

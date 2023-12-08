@@ -34,6 +34,8 @@ Then, a playbook using this role looks like the following.
     - role: systemd-networkd
       systemd_network_confs:
         # /etc/systemd/networkd.conf.d/*.conf files are configured here; see below for detailed description
+      systemd_resolve_confs:
+        # /etc/systemd/resolved.conf.d/*.conf files are configured here; see below for detailed description
       systemd_network_netdevs:
         # /etc/systemd/network/*.netdev files are configured here; see below for examples
       systemd_network_networks:
@@ -142,6 +144,9 @@ systemd_network_networks:
   the second-layer keys turn into INI properties and
   the values thereunder turn into the respective INI values.
 
+* Similarly, a key `x` in `systemd_resolve_confs` causes an INI
+  file `/etc/systemd/resolved.conf.d/x.conf` to be created.
+
 * A key `x` in `systemd_network_netdevs` causes an INI file
   `/etc/systemd/network/x.netdev` to be created.
   By default it contains:
@@ -230,8 +235,8 @@ systemd_network_networks:
 
 This role automatically disables resolvconf, enables systemd-resolved
 and configures the `/etc/resolv.conf` symlink correctly for systemd-resolved.
-Note that systemd-resolved reads the DNS servers from your systemd network
-configuration.
+Note that systemd-resolved reads the interface-specific DNS servers from your systemd network
+configuration, you can configure global settings via `systemd_resolve_confs`.
 
 ## Upload extra files
 
@@ -280,9 +285,11 @@ systemd_network_networks:
 
 ## Role variable defaults
 
-| Name                                        | Default              | Description                                                                                                                                          |
-| :------------------------------------------ | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `systemd_network_netdevs`                   | `{}`                 | [#detailed-description](#detailed-description)                                                                                                       |
-| `systemd_network_networks`                  | `{}`                 | [#detailed-description](#detailed-description)                                                                                                       |
-| `systemd_network_copy_files`                | `[]`                 | [#upload-extra-files](#upload-extra-files)                                                                                                           |
-| `systemd_network_keep_existing_definitions` | `false`              | If false, the role deletes existing `.netdev` and `.network` files in `/etc/systemd/network/` and also deletes the corresponding network interfaces. |
+| Name                                        | Default | Description                                                                                                                                          |
+| :------------------------------------------ | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `systemd_network_confs `                    | `{}`    | [#detailed-description]                                                                                                                              |
+| `systemd_resolve_confs `                    | `{}`    | [#detailed-description]                                                                                                                              |
+| `systemd_network_netdevs`                   | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
+| `systemd_network_networks`                  | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
+| `systemd_network_copy_files`                | `[]`    | [#upload-extra-files](#upload-extra-files)                                                                                                           |
+| `systemd_network_keep_existing_definitions` | `false` | If false, the role deletes existing `.netdev` and `.network` files in `/etc/systemd/network/` and also deletes the corresponding network interfaces. |
