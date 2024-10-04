@@ -6,13 +6,12 @@ galaxy_info:
 
   license: AGPLv3
 
-  min_ansible_version: 2.6
+  min_ansible_version: "2.6"
 
   platforms:
     - name: Debian
       versions:
-        - stretch
-        - buster
+        - bookworm
 
   galaxy_tags:
     - systemd

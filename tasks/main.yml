@@ -185,13 +185,6 @@
     enabled: True
     state: started
 
-- name: Disable legacy networking
-  systemd:
-    name: networking
-    enabled: False
-    masked: True
-    state: stopped
-
 - name: Remove content from /etc/network/interfaces
   copy:
     dest: /etc/network/interfaces
