@@ -1,4 +1,10 @@
 ---
+- name: Create extra directories relevant for systemd-networkd
+  file:
+    path: "{{ item | dirname }}"
+    state: directory
+  loop: "{{ systemd_network_copy_files | map(attribute='dest') | list + ['/etc/systemd/networkd.conf.d/', '/etc/systemd/resolved.conf.d/', '/etc/network/'] }}"
+
 - name: Find existing systemd-network config files
   find:
     paths:
@@ -38,12 +44,6 @@
         | difference((systemd_network_networks | combine).keys())
       }}
   when: not systemd_network_keep_existing_definitions
-
-- name: Create extra directories relevant for systemd-networkd
-  file:
-    path: "{{ item | dirname }}"
-    state: directory
-  loop: "{{ systemd_network_copy_files | map(attribute='dest') | list + ['/etc/systemd/networkd.conf.d/', '/etc/systemd/resolved.conf.d/'] }}"
 
 - name: Instantiate systemd-networkd networkd.conf drop-ins
   template:
@@ -107,8 +107,8 @@
     follow: False
 
 - name: Check if resolvconf service exists
-  command: systemctl list-unit-files resolvconf.service
-  failed_when: False
+  command: systemctl cat resolvconf.service
+  failed_when: resolvconf_service_list.rc not in [0, 1]
   changed_when: False
   register: resolvconf_service_list
 
@@ -185,12 +185,19 @@
     enabled: True
     state: started
 
+- name: Check if legacy networking exists
+  command: systemctl cat networking
+  failed_when: networking_service_exists.rc not in [0, 1]
+  changed_when: False
+  register: networking_service_exists
+
 - name: Disable legacy networking
   systemd:
     name: networking
     enabled: False
     masked: True
     state: stopped
+  when: networking_service_exists.rc == 0
 
 - name: Remove content from /etc/network/interfaces
   copy:
