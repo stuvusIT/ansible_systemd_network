@@ -1,0 +1,148 @@
+---
+- name: Instantiate systemd-networkd networkd.conf drop-ins
+  template:
+    src: conf.j2
+    dest: /etc/systemd/networkd.conf.d/{{ conf.key }}.conf
+    owner: systemd-network
+    mode: 0640
+  loop: "{{ systemd_network_confs | combine | dict2items }}"
+  loop_control:
+    loop_var: conf
+    label: "{{ conf.key }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd service
+
+- name: Instantiate systemd-networkd network devices
+  template:
+    src: netdev.j2
+    dest: /etc/systemd/network/{{ netdev.key }}.netdev
+    owner: systemd-network
+    mode: 0640
+  loop: "{{ systemd_network_netdevs | combine | dict2items }}"
+  loop_control:
+    loop_var: netdev
+    label: "{{ netdev.key }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd service
+
+- name: Instantiate systemd-networkd networks
+  template:
+    src: network.j2
+    dest: /etc/systemd/network/{{ network.key }}.network
+    owner: systemd-network
+    mode: 0640
+  loop: "{{ systemd_network_networks | combine | dict2items }}"
+  loop_control:
+    loop_var: network
+    label: "{{ network.key }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd service
+
+- name: Copy extra files relevant for systemd-networkd
+  copy: "{{ item }}"
+  loop: "{{ systemd_network_copy_files }}"
+  notify:
+    - Restart systemd-networkd service
+
+- name: Capture unwanted networkd conf files
+  find:
+    paths:
+      - /etc/systemd/networkd.conf.d/
+    patterns:
+      - "*.conf"
+    excludes: >-
+      {{
+        (systemd_network_confs | combine).keys() | map('regex_replace', '$', '.conf')
+      }}
+  register: systemd_network_unwanted_network_conf_files
+
+- name: Capture unwanted network files
+  find:
+    paths:
+      - /etc/systemd/network/
+    patterns:
+      - "*.netdev"
+      - "*.network"
+    excludes: >-
+      {{
+        (systemd_network_netdevs | combine).keys() | map('regex_replace', '$', '.netdev')
+        +
+        (systemd_network_networks | combine).keys() | map('regex_replace', '$', '.network')
+      }}
+  register: systemd_network_unwanted_network_files
+
+- name: Delete existing unwanted network interfaces
+  shell: |
+    if [ ! -e /sys/class/net/{{ interface_name | quote }} ]; then
+      exit 128
+    fi
+    ip link delete {{ interface_name | quote }}
+  # From `man ip`:
+  # Exit status is 0 if command was successful, and 1 if there is a syntax error.  If an error was reported by the kernel exit status is 2.
+  register: result
+  failed_when: result.rc not in [0, 128]
+  changed_when: result.rc != 128
+  notify:
+    - Restart systemd-networkd service
+  loop: >-
+    {{
+      systemd_network_unwanted_network_files.files
+        | map(attribute='path')
+        | select("match", "^/etc/systemd/network/.*\.netdev$")
+        | map('basename') | map('splitext') | map('first')
+    }}
+  loop_control:
+    loop_var: interface_name
+  when: not systemd_network_keep_existing_definitions
+
+- name: Delete unwanted systemd-networkd config files
+  file:
+    state: absent
+    path: "{{ path }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-networkd service
+  loop: >-
+    {{
+      (
+        systemd_network_unwanted_network_conf_files.files
+        +
+        systemd_network_unwanted_network_files.files
+      ) | map(attribute='path')
+    }}
+  loop_control:
+    loop_var: path
+  when: not systemd_network_keep_existing_definitions
+
+- meta: flush_handlers
+
+- name: Enable systemd-networkd service
+  service:
+    name: systemd-networkd
+    enabled: True
+    state: started
+
+- name: Check if legacy networking exists
+  command: systemctl cat networking
+  failed_when: networking_service_exists.rc not in [0, 1]
+  changed_when: False
+  register: networking_service_exists
+
+- name: Disable legacy networking
+  systemd:
+    name: networking
+    enabled: False
+    masked: True
+    state: stopped
+  when: networking_service_exists.rc == 0
+
+- name: Remove content from /etc/network/interfaces
+  copy:
+    dest: /etc/network/interfaces
+    content: |
+      # Ansible managed - Do not edit here
+      # We do not use legacy networking but systemd-networkd.
+      # See /etc/systemd/network/ for the configuration
