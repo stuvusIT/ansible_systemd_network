@@ -9,3 +9,5 @@
   tags: [systemd-network]
 - include_tasks: resolve.yml
   tags: [systemd-resolve]
+- include_tasks: mounts.yml
+  tags: [systemd-mounts]

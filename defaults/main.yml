@@ -5,3 +5,4 @@ systemd_network_netdevs: {}
 systemd_network_networks: {}
 systemd_network_copy_files: []
 systemd_network_keep_existing_definitions: false
+systemd_mounts: {}
