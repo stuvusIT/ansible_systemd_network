@@ -1,0 +1,77 @@
+---
+- name: Install systemd-resolved
+  package:
+    name: systemd-resolved
+  when: ansible_distribution == 'Debian' and not ansible_distribution_major_version is version('12', '<')
+
+- name: Configure resolv.conf
+  file:
+    dest: /etc/resolv.conf
+    state: link
+    src: /run/systemd/resolve/resolv.conf
+    force: True
+    follow: False
+
+- name: Check if resolvconf service exists
+  command: systemctl cat resolvconf.service
+  failed_when: resolvconf_service_list.rc not in [0, 1]
+  changed_when: False
+  register: resolvconf_service_list
+
+- name: Stop, disable, and mask resolvconf
+  systemd:
+    name: resolvconf
+    enabled: False
+    masked: True
+    state: stopped
+  when: resolvconf_service_list.rc == 0
+
+- name: Instantiate systemd-resolved resolved.conf drop-ins
+  template:
+    src: conf.j2
+    dest: /etc/systemd/resolved.conf.d/{{ conf.key }}.conf
+    owner: systemd-resolve
+    mode: 0640
+  loop: "{{ systemd_resolve_confs | combine | dict2items }}"
+  loop_control:
+    loop_var: conf
+    label: "{{ conf.key }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-resolved service
+
+- name: Capture unwanted resolved conf files
+  find:
+    paths:
+      - /etc/systemd/resolved.conf.d/
+    patterns:
+      - "*.conf"
+    excludes: >-
+      {{
+        (systemd_resolve_confs | combine).keys() | map('regex_replace', '$', '.conf')
+      }}
+  register: systemd_network_unwanted_resolve_conf_files
+
+- name: Delete unwanted systemd-resolved config files
+  file:
+    state: absent
+    path: "{{ path }}"
+  notify:
+    - Reload systemd configuration
+    - Restart systemd-resolved service
+  loop: >-
+    {{
+      (
+        systemd_network_unwanted_resolve_conf_files.files
+      ) | map(attribute='path')
+    }}
+  loop_control:
+    loop_var: path
+
+- meta: flush_handlers
+
+- name: Enable systemd-resolved
+  service:
+    name: systemd-resolved
+    enabled: True
+    state: started
