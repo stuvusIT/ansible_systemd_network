@@ -1,0 +1,37 @@
+---
+- name: Initialize list of wanted mount units
+  set_fact:
+    systemd_mount_wanted_mount_unit_filenames: []
+
+- name: Instantiate mount units
+  include_tasks: mount-unit.yml
+  loop: "{{ systemd_mounts | combine | dict2items }}"
+  loop_control:
+    loop_var: conf
+    label: "{{ conf.key }}"
+
+- name: Capture unwanted mount units
+  find:
+    paths:
+      - /etc/systemd/system/
+    patterns:
+      - "*.mount"
+    excludes: "{{ systemd_mount_wanted_mount_unit_filenames }}"
+  register: systemd_mount_unwanted_mount_unit_files
+
+- name: Delete unwanted mount units
+  file:
+    state: absent
+    path: "{{ path }}"
+  notify:
+    - Reload systemd configuration
+  loop: >-
+    {{
+      (
+        systemd_mount_unwanted_mount_unit_files.files
+      ) | map(attribute='path')
+    }}
+  loop_control:
+    loop_var: path
+
+- meta: flush_handlers

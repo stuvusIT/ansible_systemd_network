@@ -22,6 +22,7 @@ Useful links:
 
 * https://wiki.archlinux.org/index.php/Systemd-networkd
 * https://www.freedesktop.org/software/systemd/man/networkd.conf.html
+* https://www.freedesktop.org/software/systemd/man/systemd.mount.html
 * https://www.freedesktop.org/software/systemd/man/systemd.netdev.html
 * https://www.freedesktop.org/software/systemd/man/systemd.network.html
 
@@ -36,6 +37,8 @@ Then, a playbook using this role looks like the following.
         # /etc/systemd/networkd.conf.d/*.conf files are configured here; see below for detailed description
       systemd_resolve_confs:
         # /etc/systemd/resolved.conf.d/*.conf files are configured here; see below for detailed description
+      systemd_mounts:
+        # /etc/systemd/system/*.mount files are configured here; see below for examples
       systemd_network_netdevs:
         # /etc/systemd/network/*.netdev files are configured here; see below for examples
       systemd_network_networks:
@@ -146,6 +149,19 @@ systemd_network_networks:
 
 * Similarly, a key `x` in `systemd_resolve_confs` causes an INI
   file `/etc/systemd/resolved.conf.d/x.conf` to be created.
+
+* A key `x` in `systemd_mounts` causes an INI
+  file `/etc/systemd/system/<name>.mount` to be created.
+  However, because mount unit files need to be named after the mountpoint, this
+  role generates the `<name>` via
+  `systemd-escape --suffix=mount --path {{ systemd_mounts['x'].Mount.Where }}`.
+  Therefore the name of the key `x` itself doesn't have any effect.
+
+  Note that this role doesn't start/stop any mount units.
+  This role only handles creation of mount unit files.
+  To automatically mount a filesystem at boot, set
+  `systemd_mounts['x'].Unit.Before: local-fs.target` (or `remote-fs.target`
+  for remote filesystems).
 
 * A key `x` in `systemd_network_netdevs` causes an INI file
   `/etc/systemd/network/x.netdev` to be created.
@@ -287,8 +303,9 @@ systemd_network_networks:
 
 | Name                                        | Default | Description                                                                                                                                          |
 | :------------------------------------------ | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `systemd_network_confs `                    | `{}`    | [#detailed-description]                                                                                                                              |
-| `systemd_resolve_confs `                    | `{}`    | [#detailed-description]                                                                                                                              |
+| `systemd_network_confs`                     | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
+| `systemd_resolve_confs`                     | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
+| `systemd_mounts`                            | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
 | `systemd_network_netdevs`                   | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
 | `systemd_network_networks`                  | `{}`    | [#detailed-description](#detailed-description)                                                                                                       |
 | `systemd_network_copy_files`                | `[]`    | [#upload-extra-files](#upload-extra-files)                                                                                                           |

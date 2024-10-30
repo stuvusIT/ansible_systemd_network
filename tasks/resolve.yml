@@ -50,7 +50,7 @@
       {{
         (systemd_resolve_confs | combine).keys() | map('regex_replace', '$', '.conf')
       }}
-  register: systemd_network_unwanted_resolve_conf_files
+  register: systemd_resolve_unwanted_resolve_conf_files
 
 - name: Delete unwanted systemd-resolved config files
   file:
@@ -62,7 +62,7 @@
   loop: >-
     {{
       (
-        systemd_network_unwanted_resolve_conf_files.files
+        systemd_resolve_unwanted_resolve_conf_files.files
       ) | map(attribute='path')
     }}
   loop_control:

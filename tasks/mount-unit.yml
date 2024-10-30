@@ -1,0 +1,26 @@
+- name: Obtain mount unit filename
+  command:
+    argv:
+      - systemd-escape
+      - --suffix=mount
+      - --path 
+      - "{{ conf.value.Mount.Where }}"
+  changed_when: False
+  register: systemd_mount_unit_file_name
+
+- set_fact:
+    filename: "{{ systemd_mount_unit_file_name.stdout | trim }}"
+
+- name: Add filename to list of wanted mount units
+  set_fact:
+    systemd_mount_wanted_mount_unit_filenames: >-
+      {{ systemd_mount_wanted_mount_unit_filenames + [filename] }}
+
+- name: Instantiate mount unit
+  template:
+    src: conf.j2
+    dest: /etc/systemd/system/{{ filename }}
+    owner: root
+    mode: 0640
+  notify:
+    - Reload systemd configuration
